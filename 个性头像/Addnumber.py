@@ -5,7 +5,6 @@
 
 from PIL import Image, ImageDraw, ImageFont
 import random
-import numpy as np
 
 
 class Individuation(object):
