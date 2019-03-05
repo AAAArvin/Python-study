@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}文件管理{% endblock %}
+{% block nav_file_active %}active{% endblock %}
+{% block body %}
+    <div class="containter">
+        <div class="row">
+            <div class="col-md-6 col-md-offset-3">
+                <div class="panel panel-default">
+                    <div class="panel-heading">文件批量导入或删除</div>
+                    {% if files %}
+                        <table class="table">
+                            <tbody>
+                            <tr>
+                                <td>文件名称</td>
+                                <td>上传时间</td>
+                                <td>动作</td>
+                            </tr>
+                            {% for file in files %}
+                                <tr>
+                                    <td>{{ file.file.url }}</td>
+                                    <td>{{ file.time }}</td>
+                                    <td><a href="{% url 'import_data_from_files' file.time|date:"Y-m-d" file.pk %}"><span class="glyphicon glyphicon-import">导入</span></a>&nbsp;/&nbsp;<a><span class="glyphicon glyphicon-remove">删除</span></a></td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <div class="alert alert-danger" role="alert">
+                            <span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span>
+                            <span class="sr-only">Error:</span>
+                            暂无上传文件
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

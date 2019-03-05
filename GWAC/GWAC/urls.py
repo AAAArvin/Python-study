@@ -14,9 +14,11 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include
+from django.urls import path, include, re_path
 from .views import *
 from datum import views
+from django.conf import settings
+from django.conf.urls.static import static
 
 
 urlpatterns = [
@@ -25,4 +27,7 @@ urlpatterns = [
     path('data_add_form/', views.data_add_form, name='data_add_form'),
     path('datum/', include('datum.urls')),
     path('accounts/', include('user.urls')),
+    re_path(r'^search/$', views.search, name='search'),
 ]
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

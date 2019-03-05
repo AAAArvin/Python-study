@@ -128,6 +128,10 @@ STATICFILES_DIRS = [
     os.path.join(BASE_DIR, 'static'),
 ]
 
+# 上传文件路径
+MEDIA_URL = '/upload_files/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'upload_files')
+
 
 # 自定义参数，每页展示观测数据数量
-EACH_PAGE_DATA_NUMBER = 2
+EACH_PAGE_DATA_NUMBER = 8

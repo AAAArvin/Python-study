@@ -1,5 +1,9 @@
 from django.db import models
 import datetime
+import os
+import uuid
+import re
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -8,15 +12,15 @@ class Object_list_all(models.Model):
     观测目标列表总表
     '''
     STAGE_CHOICE = (
-        ('0', 'current'),
-        ('1', 'past'),
-        ('2', 'future'),
-        ('3', 'removed'),
+        ('current', 'current'),
+        ('past', 'past'),
+        ('future', 'future'),
+        ('removed', 'removed'),
     )
 
     MODE_CHOICE = (
-        ('0', 'observation'),
-        ('1', 'test'),
+        ('observation', 'observation'),
+        ('test', 'test'),
     )
     Object_name = models.CharField('目标名称', max_length=40)
     Object_alias_1 = models.CharField('目标别名1', max_length=30, blank=True)
@@ -44,12 +48,14 @@ class Object_list_all(models.Model):
     prioriy = models.IntegerField('优先级', default=20)
     run_name = models.IntegerField('曝光轮次', default=1)
     note = models.CharField('观测说明', max_length=30, blank=True)
-    Obs_stage = models.CharField('观测阶段', max_length=30, choices=STAGE_CHOICE)
-    mode = models.CharField('模式', max_length=30, choices=MODE_CHOICE)
+    Obs_stage = models.CharField('观测阶段', max_length=30, default='current', choices=STAGE_CHOICE)
+    mode = models.CharField('模式', max_length=30, default='observation', choices=MODE_CHOICE)
+    insert_time = models.DateField('插入时间', auto_now_add=True)
 
     class Meta:
         verbose_name = '观测目标列表总表'
         verbose_name_plural = verbose_name
+        db_table = 'Object_list_all'
         ordering = ['prioriy']
 
     def __str__(self):
@@ -61,9 +67,9 @@ class Object_list_current(models.Model):
     待观测目标列表
     '''
     STAGED_CHOICE = (
-        ('0', 'scheduled'),
-        ('1', 'completed'),
-        ('2', 'canceled'),
+        (0, 'scheduled'),
+        (1, 'completed'),
+        (2, 'canceled'),
     )
     MODE_CHOICE = (
         ('0', 'test'),
@@ -79,6 +85,36 @@ class Object_list_current(models.Model):
     class Meta:
         verbose_name = '待观测目标列表'
         verbose_name_plural = verbose_name
+        db_table = 'Object_list_current'
 
     def __str__(self):
         return "%s" % self.Object_ID
+
+
+#定义上传文件路径与名称
+def user_directory_path(instance, filename):
+    ext = filename.split('.')[-1]
+    filename = '{}.{}'.format(uuid.uuid4().hex[:10], ext)
+    filetype = re.search(r'[^.]+\w$', filename).group()    #提取文件后缀名
+    return os.path.join(filetype, filename)
+
+
+class File(models.Model):
+    file = models.FileField(upload_to=user_directory_path, null=True, verbose_name='文件')
+    time = models.DateField(verbose_name='插入时间', auto_now_add=True)
+
+
+#记录用户动作
+class UserAction(models.Model):
+    TYPE_CHOICE = (
+        ('增加', '增加'),
+        ('删除', '删除'),
+        ('修改', '修改'),
+    )
+    username = models.CharField(verbose_name='用户名', max_length=30)
+    action_time = models.DateTimeField(verbose_name='修改时间', auto_now_add=True)
+    action_type = models.CharField(verbose_name='修改类型', choices=TYPE_CHOICE, max_length=30)
+
+    class Meta:
+        verbose_name_plural = '用户动作'
+        db_table = 'UserAction'

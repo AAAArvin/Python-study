@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% block title %}搜索结果{% endblock %}
+{% block body %}
+    <div class="containter">
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 col-md-8 col-md-offset-2">
+                <div class="panel panel-default">
+                    <div class="panel-heading">
+                        搜索结果列表(共有{{ results.count }}条搜索结果)
+                    </div>
+                    {% if results %}
+                         <table class="table">
+                             <tbody>
+                                 <tr>
+                                     <td>目标名称</td>
+                                     <td>目标别名1</td>
+                                     <td>目标别名2</td>
+                                     <td>目标类型</td>
+                                     <td>目标来源</td>
+                                     <td>观测者</td>
+                                     <td>观测项目</td>
+                                     <td>设备群</td>
+                                     <td>设备编号</td>
+                                     <td>观测类型</td>
+                                     <td>观测策略</td>
+                                     <td>观测说明</td>
+                                     <td>观测阶段</td>
+                                     <td>模式</td>
+                                 </tr>
+                                {% for list in results %}
+                                    {% if list.Obs_stage != 'remove' %}
+                                        <tr>
+                                            <td><a href="{% url 'detail' list.pk %}">{{ list.Object_name }}</a></td>
+                                            <td>{{ list.Object_alias_1 }}</td>
+                                            <td>{{ list.Object_alias_2 }}</td>
+                                            <td>{{ list.Obj_Type }}</td>
+                                            <td>{{ list.Obj_source }}</td>
+                                            <td>{{ list.Observer }}</td>
+                                            <td>{{ list.Obs_program }}</td>
+                                            <td>{{ list.Group_ID }}</td>
+                                            <td>{{ list.Unit_ID }}</td>
+                                            <td>{{ list.Observation_type }}</td>
+                                            <td>{{ list.Observation_strategy }}</td>
+                                            <td>{{ list.note }}</td>
+                                            <td>{{ list.Obs_stage }}</td>
+                                            <td>{{ list.mode }}</td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <p class="font">无搜索结果</p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
