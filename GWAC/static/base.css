@@ -45,3 +45,11 @@ a.link-button:hover {
 a.link-button:active {
     text-decoration: none;
 }
+
+span.highlighted {
+    color: yellow;
+}
+
+h3.results-head {
+    text-align: center;
+}

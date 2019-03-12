@@ -7,10 +7,34 @@ from django.contrib.auth.models import User
 
 # Create your models here.
 
-class Object_list_all(models.Model):
+class Objects(models.Model):
     '''
     观测目标列表总表
     '''
+    TYPE_CHOICE = (
+        ('Mon', 'Mon'),
+        ('ObA', 'ObA'),
+        ('ObM', 'ObM'),
+        ('GOA', 'GOA'),
+        ('GOM', 'GOM'),
+        ('ToM', 'ToM'),
+        ('ROt', 'ROt'),
+        ('Man', 'Man'),
+    )
+
+    GROUP_CHOICE = (
+        ('XL001', 'XL001'),
+        ('XL002', 'XL002'),
+        ('XL003', 'XL003'),
+    )
+
+    UNIT_CHOICE = (
+        ('001', '001'),
+        ('002', '002'),
+        ('003', '003'),
+        ('004', '004'),
+    )
+
     STAGE_CHOICE = (
         ('current', 'current'),
         ('past', 'past'),
@@ -29,13 +53,13 @@ class Object_list_all(models.Model):
     Obj_source = models.CharField('目标来源', max_length=30, blank=True)
     Observer = models.CharField('观测者', max_length=30)
     Obs_program = models.CharField('观测项目', max_length=30, blank=True)
-    Obj_RA = models.FloatField('目标赤经', max_length=30)
-    Obj_DEC = models.FloatField('目标赤纬', max_length=30)
+    Obj_RA = models.CharField('目标赤经', max_length=30)
+    Obj_DEC = models.CharField('目标赤纬', max_length=30)
     Obj_Epoch = models.IntegerField('历元', default=2000)
-    Obj_Error = models.FloatField('误差', max_length=30, default=0)
-    Group_ID = models.CharField('设备群', max_length=30)
-    Unit_ID = models.CharField('设备编号', max_length=30)
-    Observation_type = models.CharField('观测类型', max_length=30, default='man')
+    Obj_Error = models.CharField('误差', max_length=30, default='0.0|0.0')
+    Observation_type = models.CharField('观测类型', max_length=30, choices=TYPE_CHOICE, default='Man')
+    Group_ID = models.CharField('设备群', max_length=30, choices=GROUP_CHOICE)
+    Unit_ID = models.CharField('设备编号', max_length=30, choices=UNIT_CHOICE)
     Observation_strategy = models.CharField('观测策略', max_length=30, default='pointing')
     Obs_date_begin = models.DateField('观测起始日期', max_length=30, default=datetime.date.today)
     Obs_date_end = models.DateField('观测结束日期', max_length=30)
@@ -55,7 +79,6 @@ class Object_list_all(models.Model):
     class Meta:
         verbose_name = '观测目标列表总表'
         verbose_name_plural = verbose_name
-        db_table = 'Object_list_all'
         ordering = ['prioriy']
 
     def __str__(self):
@@ -67,15 +90,15 @@ class Object_list_current(models.Model):
     待观测目标列表
     '''
     STAGED_CHOICE = (
-        (0, 'scheduled'),
-        (1, 'completed'),
-        (2, 'canceled'),
+        ('0', 'scheduled'),
+        ('1', 'completed'),
+        ('2', 'canceled'),
     )
     MODE_CHOICE = (
         ('0', 'test'),
         ('1', 'observation'),
     )
-    Object_ID = models.ForeignKey(Object_list_all, on_delete=models.CASCADE)
+    Object_ID = models.ForeignKey(Objects, on_delete=models.CASCADE)
     Obs_date_current = models.DateField('观测日期', max_length=30)
     Obs_timewindow_begin = models.DateTimeField('可观测时间窗口起始时间', max_length=30)
     Obs_timewindow_end = models.DateTimeField('可观测时间窗口结束时间', max_length=30)

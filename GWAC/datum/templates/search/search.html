@@ -1,0 +1,75 @@
+{% extends 'base.html' %}
+{% load highlight %}
+{% block title %}搜索结果{% endblock %}
+{% block body %}
+    <div class="containter">
+        <div class="row">
+            <div class="col-xs-12 col-sm-8 col-md-8 col-md-offset-2">
+                <div class="panel panel-default">
+                    <div class="panel-heading"><h3 class="results-head">搜索结果如下:</h3></div>
+                    {% if query %}
+                        {% if page.object_list %}
+                            <table class="table">
+                                <tbody>
+                                <tr>
+                                    <td>目标名称</td>
+                                    <td>目标别名1</td>
+                                    <td>目标别名2</td>
+                                    <td>目标类型</td>
+                                    <td>目标来源</td>
+                                    <td>观测者</td>
+                                    <td>观测项目</td>
+                                    <td>赤经</td>
+                                    <td>赤纬</td>
+                                    <td>设备群</td>
+                                    <td>设备编号</td>
+                                    <td>观测类型</td>
+                                    <td>观测策略</td>
+                                    <td>观测起始日期</td>
+                                    <td>观测结束日期</td>
+                                    <td>观测说明</td>
+                                    <td>观测阶段</td>
+                                    <td>模式</td>
+                                </tr>
+                                {% for list in page.object_list %}
+                                    {% if list.Obs_stage != 'remove' %}
+                                        <tr>
+                                            <td><a href="{% url 'detail' list.pk %}">{% highlight list.Object_name with query %}</a></td>
+                                            <td>{% highlight list.Object_alias_1 with query %}</td>
+                                            <td>{% highlight list.Object_alias_2 with query %}</td>
+                                            <td>{% highlight list.Obj_Type with query %}</td>
+                                            <td>{% highlight list.Obj_source with query %}</td>
+                                            <td>{% highlight list.Observer with query %}</td>
+                                            <td>{% highlight list.Obs_program with query %}</td>
+                                            <td>{% highlight list.Obj_RA with query %}</td>
+                                            <td>{% highlight list.Obj_DEC with query %}</td>
+                                            <td>{% highlight list.Group_ID with query %}</td>
+                                            <td>{% highlight list.Unit_ID with query %}</td>
+                                            <td>{% highlight list.Observation_type with query %}</td>
+                                            <td>{% highlight list.Observation_strategy with query %}</td>
+                                            <td>{% highlight list.Obs_date_begin with query %}</td>
+                                            <td>{% highlight list.Obs_date_end with query %}</td>
+                                            <td>{% highlight list.note with query %}</td>
+                                            <td>{% highlight list.Obs_stage with query %}</td>
+                                            <td>{% highlight list.mode with query %}</td>
+                                        </tr>
+                                    {% endif %}
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <p class="font">无搜索结果</p>
+                        {% endif %}
+
+                        {% if page.has_previous or page.has_next %}
+                            <div>
+                                {% if page.has_previous %}<a href="?q={{ query }}&page={{ page.previous_page_number }}">{% endif %}<span aria-hidden="true">&laquo;</span>{% if page.has_previous %}</a>{% endif %}
+                                {% if page.has_next %}<a href="?q={{ query }}&page={{ page.next_page_number }}">{% endif %}<span aria-hidden="true">&raquo;</span>{% if page.has_next %}</a>{% endif %}
+                            </div>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

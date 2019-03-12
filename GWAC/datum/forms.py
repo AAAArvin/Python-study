@@ -8,7 +8,7 @@ User = get_user_model()
 
 class DataChangeForm(ModelForm):
     class Meta:
-        model = Object_list_all
+        model = Objects
         fields = '__all__'
 
     def __init__(self, *args, **kwargs):
@@ -22,31 +22,38 @@ class DataChangeForm(ModelForm):
 
 class DataAddForm(ModelForm):
     #增加一条观测目标表单
-    class Meta:
-        model = Object_list_all
-        fields = '__all__'
 
-    # 检验观测者是否存在
-    def clean_Observer(self):
-        Observer = self.cleaned_data['Observer']
-        if not User.objects.filter(username=Observer).exists():
-            raise forms.ValidationError('该用户不存在')
-        return Observer
+    class Meta:
+        model = Objects
+        exclude = ['Observer', 'Obs_stage']
+
+    Observer = forms.IntegerField(label='观测者', widget=forms.widgets.Select())
+
+    def __init__(self, *args, **kwargs):
+        super(DataAddForm, self).__init__(*args, **kwargs)
+        self.fields['Observer'].widget.choices = User.objects.values_list('id', 'username')
+
 
     # 检验观测目标是否重复
     def clean_Object_name(self):
         Object_name = self.cleaned_data['Object_name']
-        if Object_list_all.objects.filter(Object_name=Object_name).exists():
+        if Objects.objects.filter(Object_name=Object_name).exists():
             raise forms.ValidationError('该观测目标已存在')
         return Object_name
 
-    '''#检验经度格式是否正确
+    #检验经度格式是否正确
     def clean_Obj_RA(self):
         Obj_RA = self.cleaned_data['Obj_RA']
+        value_dd = float(Obj_RA.split(":")[0]) + float(Obj_RA.split(":")[1]) / 60.0 + float(
+            Obj_RA.split(":")[2]) / 3600.0
+        return value_dd
 
     #检验纬度格式是否正确
     def clean_Obj_DEC(self):
-        Obj_DEC = self.cleaned_data['Obj_DEC']'''
+        Obj_DEC = self.cleaned_data['Obj_DEC']
+        value_dd = float(Obj_DEC.split(":")[0]) * 15.0 + float(Obj_DEC.split(":")[1]) / 60.0 * 15.0 + float(
+            Obj_DEC.split(":")[2]) / 3600.0 * 15.0
+        return value_dd
 
 
 class FileUploadModelForm(ModelForm):

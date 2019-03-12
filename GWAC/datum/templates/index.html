@@ -2,101 +2,112 @@
 {% block title %}GWAC|首页{% endblock %}
 {% block nav_data_active %}active{% endblock %}
 {% block body %}
-    <div class="container">
-        <div class="row">
-            <div class="col-xs-12 col-sm-8 col-md-8">
-                <div class="panel panel-default">
-                    <div class="panel-heading">
-                        观测目标列表(今天插入{{ lists_today_insert.count }}条|共有{{ list_total.count }}条观测目标)
-                        <div class="pull-right">
-                            <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#data_modal" onclick="add">增加</button>
-                            <button type="button" class="btn btn-danger btn-xs pull-right" data-toggle="modal" data-target="#data_del_modal" onclick="delete_data">删除</button>
-                            <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target="#upload_modal" onclick="upload">上传</button>
-                            <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target="#download_modal" onclick="download">下载</button>&nbsp;
-                        </div>
-                    </div>
-                    <table class="table">
-                        <tbody>
-                            <tr>
-                                <td>目标名称</td>
-                                <td>目标别名1</td>
-                                <td>目标别名2</td>
-                                <td>目标来源</td>
-                                <td>观测者</td>
-                                <td>目标赤经</td>
-                                <td>目标赤纬</td>
-                                <td>历元</td>
-                                <td>误差</td>
-                                <td>设备群</td>
-                                <td>设备编号</td>
-                                <td>观测类型</td>
-                                <td>观测起始日期</td>
-                                <td>观测结束日期</td>
-                                <td>优先级</td>
-                            </tr>
-                            {% for list in page_of_lists %}
-                                {% if list.Obs_stage != 'remove' %}
-                                    <tr>
-                                        <td><a href="{% url 'detail' list.pk %}">{{ list.Object_name }}</a></td>
-                                        <td>{{ list.Object_alias_1 }}</td>
-                                        <td>{{ list.Object_alias_2 }}</td>
-                                        <td>{{ list.Obj_source }}</td>
-                                        <td>{{ list.Observer }}</td>
-                                        <td>{{ list.Obj_RA }}</td>
-                                        <td>{{ list.Obj_DEC }}</td>
-                                        <td>{{ list.Obj_Epoch }}</td>
-                                        <td>{{ list.Obj_Error }}</td>
-                                        <td>{{ list.Group_ID }}</td>
-                                        <td>{{ list.Unit_ID }}</td>
-                                        <td>{{ list.Observation_type }}</td>
-                                        <td>{{ list.Obs_date_begin }}</td>
-                                        <td>{{ list.Obs_date_end }}</td>
-                                        <td>{{ list.prioriy }}</td>
-                                    </tr>
-                                {% endif %}
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-                <div class="paginator">
-                    <ul class="pagination">
-                        <li>
-                            {% if page_of_lists.has_previous %}
-                                <a href="?page={{ page_of_lists.previous_page_number }}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
-                            {% else %}
-                                <span aria-hidden="true">&laquo;</span>
-                            {% endif %}
-                        </li>
-                        {% for page_num in page_range %}
-                            {% if page_num == page_of_lists.number %}
-                                <li class="active"><span>{{ page_num }}</span></li>
-                            {% else %}
-                                {% if page_num == '...' %}
-                                    <li><span>{{ page_num }}</span></li>
-                                {% else %}
-                                    <li><a href="?page={{ page_num }}">{{ page_num }}</a></li>
-                                {% endif %}
-                            {% endif %}
-                        {% endfor %}
-                        <li>
-                            {% if page_of_lists.has_next %}
-                                <a href="?page={{ page_of_lists.next_page_number }}" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
-                            {% else %}
-                                <span aria-hidden="true">&raquo;</span>
-                            {% endif %}
-                        </li>
-                     </ul>
+        <div class="col-xs-12 col-sm-8 col-md-8 col-xs-offset-1">
+            <div class="panel panel-default">
+            <div class="panel-heading">
+                <h4>观测目标列表</h4>
+                <span class="label label-success">今天插入{{ lists_today_insert.count }}条</span><span class="label label-primary">共有{{ list_total.count }}条观测目标</span>
+                <div class="pull-right">
+                    {% if user_level > 3 %}
+                        <button type="button" class="btn btn-primary btn-xs" data-toggle="modal" data-target="#data_modal" onclick="add">增加</button>
+                    {% else %}
+                        <button type="button" class="btn btn-disabled btn-xs" onclick="forbidden()">增加</button>
+                    {% endif %}
+                    {% if user_level > 3 %}
+                        <button type="button" class="btn btn-danger btn-xs pull-right" data-toggle="modal" data-target="#data_del_modal" onclick="delete_data">删除</button>
+                    {% else %}
+                        <button type="button" class="btn btn-disabled btn-xs" onclick="forbidden()">删除</button>
+                    {% endif %}
+                    {% if user_level > 3 %}
+                        <button type="button" class="btn btn-success btn-xs" data-toggle="modal" data-target="#upload_modal" onclick="upload">上传</button>&nbsp;
+                    {% else %}
+                        <button type="button" class="btn btn-disabled btn-xs" onclick="forbidden()">上传</button>&nbsp;
+                    {% endif %}
                 </div>
             </div>
-            <div class="hidden-xs col-sm-1 col-md-4">
+            <table class="table">
+                <tbody>
+                    <tr>
+                        <td>目标名称</td>
+                        <td>目标别名1</td>
+                        <td>目标别名2</td>
+                        <td>目标来源</td>
+                        <td>观测者</td>
+                        <td>目标赤经</td>
+                        <td>目标赤纬</td>
+                        <td>历元</td>
+                        <td>误差</td>
+                        <td>设备群</td>
+                        <td>设备编号</td>
+                        <td>观测类型</td>
+                        <td>观测起始日期</td>
+                        <td>观测结束日期</td>
+                        <td>优先级</td>
+                        <td>下载</td>
+                    </tr>
+                    {% for list in page_of_lists %}
+                        {% if list.Obs_stage != 'remove' %}
+                            <tr>
+                                <td><a href="{% url 'detail' list.pk %}">{{ list.Object_name }}</a></td>
+                                <td>{{ list.Object_alias_1 }}</td>
+                                <td>{{ list.Object_alias_2 }}</td>
+                                <td>{{ list.Obj_source }}</td>
+                                <td>{{ list.Observer }}</td>
+                                <td>{{ list.Obj_RA }}</td>
+                                <td>{{ list.Obj_DEC }}</td>
+                                <td>{{ list.Obj_Epoch }}</td>
+                                <td>{{ list.Obj_Error }}</td>
+                                <td>{{ list.Group_ID }}</td>
+                                <td>{{ list.Unit_ID }}</td>
+                                <td>{{ list.Observation_type }}</td>
+                                <td>{{ list.Obs_date_begin }}</td>
+                                <td>{{ list.Obs_date_end }}</td>
+                                <td>{{ list.prioriy }}</td>
+                                <td><a href="{% url 'download' list.Object_name %}"><span class="glyphicon glyphicon-download" aria-hidden="true"></span></a> </td>
+                            </tr>
+                        {% endif %}
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+            <div class="paginator">
+                <ul class="pagination">
+                    <li>
+                        {% if page_of_lists.has_previous %}
+                            <a href="?page={{ page_of_lists.previous_page_number }}" aria-label="Previous"><span aria-hidden="true">&laquo;</span></a>
+                        {% else %}
+                            <span aria-hidden="true">&laquo;</span>
+                        {% endif %}
+                    </li>
+                    {% for page_num in page_range %}
+                        {% if page_num == page_of_lists.number %}
+                            <li class="active"><span>{{ page_num }}</span></li>
+                        {% else %}
+                            {% if page_num == '...' %}
+                                <li><span>{{ page_num }}</span></li>
+                            {% else %}
+                                <li><a href="?page={{ page_num }}">{{ page_num }}</a></li>
+                            {% endif %}
+                        {% endif %}
+                    {% endfor %}
+                    <li>
+                        {% if page_of_lists.has_next %}
+                            <a href="?page={{ page_of_lists.next_page_number }}" aria-label="Next"><span aria-hidden="true">&raquo;</span></a>
+                        {% else %}
+                            <span aria-hidden="true">&raquo;</span>
+                        {% endif %}
+                    </li>
+                 </ul>
+            </div>
+        </div>
+        <div class="hidden-xs col-sm-1 col-md-3">
                 <div class="panel panel-default">
                     <div class="panel-heading">我的动作</div>
                     <div class="panel-body">
-
+                        {{ user.get_user_level }}
                     </div>
                 </div>
             </div>
-        </div>
         <!-- Modal -->
         <div class="modal fade" id="data_modal" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
@@ -174,53 +185,6 @@
             </div>
         </div>
         <!-- Modal -->
-        <div class="modal fade" id="download_modal" tabindex="-1" role="dialog">
-            <div class="modal-dialog" role="document">
-                <div class="modal-content">
-                    <form id="download_form" action="" method="POST">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                            <h4 class="modal-title">下载观测数据</h4>
-                        </div>
-                        <div class="modal-body">
-                            {% csrf_token %}
-                            <table class="table">
-                                <tbody>
-                                    <tr>
-                                        <td>选择</td>
-                                        <td>目标序号</td>
-                                        <td>目标名称</td>
-                                        <td>观测者</td>
-                                        <td>观测起始日期</td>
-                                        <td>观测结束日期</td>
-                                        <td>优先级</td>
-                                    </tr>
-                                    {% for list in lists %}
-                                        {% if list.Obs_stage != 'remove' %}
-                                            <tr>
-                                                <td class="action-checkbox"><input type="checkbox" value="{{ list.pk }}" name="download-check-box"></td>
-                                                <td><a href="{% url 'detail' list.pk %}">{{ list.Object_ID }}</a></td>
-                                                <td><a href="{% url 'detail' list.pk %}">{{ list.Object_name }}</a></td>
-                                                <td>{{ list.Observer }}</td>
-                                                <td>{{ list.Obs_date_begin }}</td>
-                                                <td>{{ list.Obs_date_end }}</td>
-                                                <td>{{ list.prioriy }}</td>
-                                            </tr>
-                                        {% endif %}
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                            <span id="data_tip" class="text-danger"></span>
-                        </div>
-                        <div class="modal-footer">
-                            <button type="submit" class="btn btn-success">下载</button>
-                            <button type="button" class="btn btn-default" data-dismiss="modal">关闭</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-        </div>
-        <!-- Modal -->
         <div class="modal fade" id="upload_modal" tabindex="-1" role="dialog">
             <div class="modal-dialog" role="document">
                 <div class="modal-content">
@@ -237,7 +201,6 @@
                 </div>
             </div>
         </div>
-    </div>
 {% endblock %}
 {% block script %}
     <script type="text/javascript">
@@ -246,9 +209,6 @@
         }
         function delete_data(){
             $('#data_del_modal').modal('show');
-        }
-        function download(){
-            $('#download_modal').modal('show');
         }
         function upload(){
             $('#upload_modal').modal('show');
@@ -289,22 +249,6 @@
                 }
             });
         });
-        $('#download_form').submit(function (event) {
-            event.preventDefault();
-            $.ajax({
-                url: '{% url "download" %}',
-                type: 'POST',
-                data: $(this).serialize(),
-                cache: false,
-                success: function(data){
-                    {% if not user.is_authenticated %}
-                        window.location.href="{% url 'login' %}";
-                    {% else %}
-                        window.location.reload();
-                    {% endif %}
-                }
-            });
-        });
         $('#upload_form').submit(function (event) {
             event.preventDefault();
             $.ajax({
@@ -321,5 +265,8 @@
                 }
             });
         });
+        function forbidden() {
+            alert('你无权操作')
+        }
     </script>
 {% endblock %}

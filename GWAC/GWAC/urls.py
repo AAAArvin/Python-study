@@ -14,20 +14,21 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path, include, re_path
+from django.urls import path, include
 from .views import *
 from datum import views
 from django.conf import settings
+import xadmin
 from django.conf.urls.static import static
 
 
 urlpatterns = [
     path('', home, name='home'),
-    path('admin/', admin.site.urls),
+    path('xadmin/', xadmin.site.urls),
     path('data_add_form/', views.data_add_form, name='data_add_form'),
     path('datum/', include('datum.urls')),
     path('accounts/', include('user.urls')),
-    re_path(r'^search/$', views.search, name='search'),
+    path(r'search/', include('haystack.urls')),
 ]
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

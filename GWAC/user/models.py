@@ -20,6 +20,10 @@ class Profile(models.Model):
     def __str__(self):
         return '<Profile: %s, %s, %s, %s>' % (self.user_level, self.user.username, self.company, self.tel)
 
+    class Meta:
+        verbose_name = '用户信息'
+        verbose_name_plural = verbose_name
+
 def get_user_level(self):
     profile = Profile.objects.get(user=self)
     return profile.user_level
